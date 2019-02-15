@@ -460,15 +460,12 @@ module Lightning
         raise UnknownHtlcId.new(commitments, command.id) unless htlc
         exist =
           commitments[:local_changes][:proposed].any? do |proposed|
-            match proposed, (on ~UpdateFulfillHtlc do |u|
-              htlc.id == u.id
-            end), (on ~UpdateFailHtlc do |u|
-              htlc.id == u.id
-            end), (on ~UpdateFailMalformedHtlc do |u|
-              htlc.id == u.id
-            end), (on any do
+            case proposed
+            when UpdateFulfillHtlc, UpdateFailHtlc, UpdateFailMalformedHtlc
+              htlc.id == proposed.id
+            else
               false
-            end)
+            end
           end
         raise UnknownHtlcId.new(commitments, command.id) if exist
         payment_hash = Bitcoin.sha256(command.r.htb).bth
@@ -500,15 +497,12 @@ module Lightning
         raise UnknownHtlcId.new(commitments, command.id) unless htlc
         exist =
           commitments[:local_changes][:proposed].any? do |proposed|
-            match proposed, (on ~UpdateFulfillHtlc do |u|
-              htlc.id == u.id
-            end), (on ~UpdateFailHtlc do |u|
-              htlc.id == u.id
-            end), (on ~UpdateFailMalformedHtlc do |u|
-              htlc.id == u.id
-            end), (on any do
+            case proposed
+            when UpdateFulfillHtlc, UpdateFailHtlc, UpdateFailMalformedHtlc
+              htlc.id == proposed.id
+            else
               false
-            end)
+            end
           end
         raise UnknownHtlcId.new(commitments, command.id) if exist
         packet = Lightning::Onion::Sphinx.parse(node_secret, htlc.onion_routing_packet.htb)
@@ -542,15 +536,12 @@ module Lightning
         raise UnknownHtlcId.new(commitments, command.id) unless htlc
         exist =
           commitments[:local_changes][:proposed].any? do |h|
-            match h, (on UpdateFulfillHtlc do |u|
-              htlc.id == u.id
-            end), (on ~UpdateFailHtlc do |u|
-              htlc.id == u.id
-            end), (on ~UpdateFailMalformedHtlc do |u|
-              htlc.id == u.id
-            end), (on any do
+            case proposed
+            when UpdateFulfillHtlc, UpdateFailHtlc, UpdateFailMalformedHtlc
+              htlc.id == proposed.id
+            else
               false
-            end)
+            end
           end
 
         raise UnknownHtlcId.new(commitments, command.id) if exist
